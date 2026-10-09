@@ -1,5 +1,6 @@
 import glfw
 from OpenGL.GL import *
+import OpenGL.GL.shaders as gls
 from objs import renderObjs as objs
 import ctypes
 
@@ -16,9 +17,10 @@ t1.setColors(
 )
 
 VAOId = 0
+shaderId = 0
 
 def init():
-    global VAOId
+    global VAOId, shaderId
 
     glClearColor(0,0,0,1)
     #iniciar VBO - obter id
@@ -55,17 +57,55 @@ def init():
     #Criar shaders
 
     #Código fonte do shader:
+    #ler vertex shader:
+    with open("src/shaders/vertexShader.glsl", "r") as file:
+        vsSource = file.read()
+    #ler fragment shader:
+    with open("src/shaders/fragmentShader.glsl", "r") as file:
+        fsSource = file.read()
+
+    vsId = gls.compileShader(vsSource, GL_VERTEX_SHADER)
+
+    """ #criar objeto vertexshader:
+    idVtShader = glCreateShader(GL_VERTEX_SHADER)
+    #enviar seu código do vertexshader para o objeto vertexshader
+    glShaderSource(idVtShader, vsSource)
+    #Compilar o objeto
+    glCompileShader(idVtShader)
+    # verificar erros
+    if not glGetShaderiv(idVtShader, GL_COMPILE_STATUS):
+        info = glGetShaderInfoLog(idVtShader)
+        print("ERRO DE COMPILAÇÃO: vertex shader:")
+        print(info) """
+
+    fsId = gls.compileShader(fsSource, GL_FRAGMENT_SHADER)
+
+    """ #criar objeto vertexshader:
+    idFsShader = glCreateShader(GL_FRAGMENT_SHADER)
+    #enviar seu código do vertexshader para o objeto vertexshader
+    glShaderSource(idFsShader, fsSource)
+    #Compilar o objeto
+    glCompileShader(idFsShader)
+    # verificar erros
+    if not glGetShaderiv(idFsShader, GL_COMPILE_STATUS):
+        info = glGetShaderInfoLog(idFsShader)
+        print("ERRO DE COMPILAÇÃO: fragment shader:")
+        print(info) """
+
+    #criar shader program:
+    shaderId = gls.compileProgram(vsId, fsId)
+     
 
 def render():
     glClear(GL_COLOR_BUFFER_BIT)
+
+    glUseProgram(shaderId)
 
     glBindVertexArray(VAOId)
     glDrawArrays(GL_TRIANGLES, 0, len(t1.getVertices()))
     
 
 def main():
-    print(t1.colors)
-    print(t1.vertices)
     
     glfw.init()
     window = glfw.create_window(500, 500, "G.R.E.E.N", None, None)
