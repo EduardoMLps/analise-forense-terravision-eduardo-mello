@@ -1,3 +1,4 @@
+import numpy as np
 
 class Triangle:
     vertices = []
@@ -17,5 +18,8 @@ class Triangle:
         self.colors.append(c2)
         self.colors.append(c3)
 
-    def setAngle(self, a):
-        self.angle = a
+    def getVertices(self):
+        return np.array(self.vertices, np.dtype(np.float32))
+
+    def getVerticesSize(self):
+        return self.getVertices().nbytes
