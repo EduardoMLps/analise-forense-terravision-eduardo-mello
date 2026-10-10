@@ -4,12 +4,30 @@ import OpenGL.GL.shaders as gls
 from objs import renderObjs as objs
 import ctypes
 
+m1 = objs.VertexMatrix()
+
 t1 = objs.Triangle()
 t1.setVertices(
-    [-0.5, 0.5, 1, 0, 0],
-    [0.0, -0.5, 0, 1, 0],
-    [0.5, 0.5, 0, 0, 1]
+    [0, 0.8, 1, 0, 0],
+    [-0.2, 0.4, 0, 1, 0],
+    [0.2, 0.4, 0, 0, 1]
 )
+
+t2 = objs.Triangle()
+t2.setVertices(
+    [-0.2, 0.4, 1, 1, 0],
+    [-0.4, 0.0, 0, 1, 1],
+    [0.0, 0.0, 1, 0, 1]
+)
+
+t3 = objs.Triangle()
+t3.setVertices(
+    [0.2, 0.4, 0, 0, 1],
+    [0.0, 0.0, 0, 1, 0],
+    [0.4, 0.0, 1, 0, 0]
+)
+
+m1.addElement(t1)
 
 VAOId = 0
 shaderId = 0
@@ -30,8 +48,8 @@ def init():
     #colocar atributos no VBO
     glBufferData(
         GL_ARRAY_BUFFER,
-        t1.getVerticesSize(),
-        t1.getVertices(),
+        m1.getVerticesSize(),
+        m1.getVertices(),
         GL_STATIC_DRAW
     )
     #descrever atributos
@@ -82,11 +100,10 @@ def render():
     glUseProgram(shaderId)
 
     glBindVertexArray(VAOId)
-    glDrawArrays(GL_TRIANGLES, 0, 3)
+    glDrawArrays(GL_TRIANGLES, 0, len(m1.getVertices()))
     
 
 def main():
-    
     glfw.init()
     window = glfw.create_window(500, 500, "G.R.E.E.N", None, None)
     glfw.make_context_current(window)

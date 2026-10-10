@@ -1,5 +1,21 @@
 import numpy as np
 
+class VertexMatrix:
+    vertices = None
+
+    def addElement(self, element):
+        if self.vertices is None:
+            self.vertices = element.getVertices()
+        else:
+            np.concatenate((self.vertices, element.getVertices()), axis=0)
+
+    def getVertices(self):
+        return np.array(self.vertices, np.dtype(np.float32))
+    
+    def getVerticesSize(self):
+        return self.getVertices().nbytes
+
+
 class Triangle:
     vertices = []
     colors = []
