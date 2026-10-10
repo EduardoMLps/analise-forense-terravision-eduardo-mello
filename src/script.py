@@ -6,14 +6,9 @@ import ctypes
 
 t1 = objs.Triangle()
 t1.setVertices(
-    [-0.5, 0.5],
-    [0.0, -0.5],
-    [0.5, 0.5]
-)
-t1.setColors(
-    [1,0,0],
-    [0,1,0],
-    [0,0,1]
+    [-0.5, 0.5, 1, 0, 0],
+    [0.0, -0.5, 0, 1, 0],
+    [0.5, 0.5, 0, 0, 1]
 )
 
 VAOId = 0
@@ -41,15 +36,24 @@ def init():
     )
     #descrever atributos
     glVertexAttribPointer(
-        0, #Código do atributo
+        0, #Código do atributo (posição)
         2, #Quantos valores por atributo
         GL_FLOAT, #Tipo de dado
-        GL_FALSE,
-        2*4, #qnt de bytes entre um atributo e o próximo
-        ctypes.c_void_p(0) #ponteiro para o vazio
+        GL_FALSE, #Deve ser normalizado
+        5*4, #qnt de bytes entre um atributo e o próximo
+        ctypes.c_void_p(0) #ponteiro para onde começa os parâmetros
+    )
+    glVertexAttribPointer(
+        1, #Código do atributo (cor)
+        3, #Quantos valores por atributo
+        GL_FLOAT, #Tipo de dado
+        GL_FALSE, #Deve ser normalizado
+        5*4, #qnt de bytes entre um atributo e o próximo
+        ctypes.c_void_p(2*4) #ponteiro para onde começa os parâmetros
     )
     #Ativar atributos
     glEnableVertexAttribArray(0)
+    glEnableVertexAttribArray(1)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0)
     glBindVertexArray(0)
@@ -64,33 +68,9 @@ def init():
     with open("src/shaders/fragmentShader.glsl", "r") as file:
         fsSource = file.read()
 
+    #Compilar shaders
     vsId = gls.compileShader(vsSource, GL_VERTEX_SHADER)
-
-    """ #criar objeto vertexshader:
-    idVtShader = glCreateShader(GL_VERTEX_SHADER)
-    #enviar seu código do vertexshader para o objeto vertexshader
-    glShaderSource(idVtShader, vsSource)
-    #Compilar o objeto
-    glCompileShader(idVtShader)
-    # verificar erros
-    if not glGetShaderiv(idVtShader, GL_COMPILE_STATUS):
-        info = glGetShaderInfoLog(idVtShader)
-        print("ERRO DE COMPILAÇÃO: vertex shader:")
-        print(info) """
-
     fsId = gls.compileShader(fsSource, GL_FRAGMENT_SHADER)
-
-    """ #criar objeto vertexshader:
-    idFsShader = glCreateShader(GL_FRAGMENT_SHADER)
-    #enviar seu código do vertexshader para o objeto vertexshader
-    glShaderSource(idFsShader, fsSource)
-    #Compilar o objeto
-    glCompileShader(idFsShader)
-    # verificar erros
-    if not glGetShaderiv(idFsShader, GL_COMPILE_STATUS):
-        info = glGetShaderInfoLog(idFsShader)
-        print("ERRO DE COMPILAÇÃO: fragment shader:")
-        print(info) """
 
     #criar shader program:
     shaderId = gls.compileProgram(vsId, fsId)
@@ -102,7 +82,7 @@ def render():
     glUseProgram(shaderId)
 
     glBindVertexArray(VAOId)
-    glDrawArrays(GL_TRIANGLES, 0, len(t1.getVertices()))
+    glDrawArrays(GL_TRIANGLES, 0, 3)
     
 
 def main():
