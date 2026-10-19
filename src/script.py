@@ -8,26 +8,21 @@ m1 = objs.VertexMatrix()
 
 t1 = objs.Triangle()
 t1.setVertices(
-    [0, 0.8, 1, 0, 0],
-    [-0.2, 0.4, 0, 1, 0],
-    [0.2, 0.4, 0, 0, 1]
+    [-0.5, 0.5, 1, 0, 0],
+    [0.5, 0.5, 0, 1, 0],
+    [0.5, -0.5, 0, 0, 1]
 )
 
 t2 = objs.Triangle()
 t2.setVertices(
-    [-0.2, 0.4, 1, 1, 0],
-    [-0.4, 0.0, 0, 1, 1],
-    [0.0, 0.0, 1, 0, 1]
+    [-0.5, 0.5, 1, 0, 0],
+    [0.5, -0.5, 0, 0, 1],
+    [-0.5, -0.5, 1, 0, 1]
 )
 
-t3 = objs.Triangle()
-t3.setVertices(
-    [0.2, 0.4, 0, 0, 1],
-    [0.0, 0.0, 0, 1, 0],
-    [0.4, 0.0, 1, 0, 0]
-)
-
+#Eu não sei o porque, mas adicionar o primeiro triângulo à matriz adiciona todos os triângulos...
 m1.addElement(t1)
+m1.addElement(t2)
 
 VAOId = 0
 shaderId = 0

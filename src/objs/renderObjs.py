@@ -15,6 +15,29 @@ class VertexMatrix:
     def getVerticesSize(self):
         return self.getVertices().nbytes
 
+    def getUniquesVertices(self):
+        self.faces = np.empty((int(len(self.vertices) / 3), 3))
+        v2 = []
+        for vertice in self.vertices:
+            for value in v2:
+                if np.array_equal(vertice, value):
+                    break
+            else:
+                v2.append(vertice)
+            
+        return np.array(v2, dtype=np.float32)
+
+    def getFacesIndex(self):
+        uniques = self.getUniquesVertices()
+        a = np.empty((int(len(self.vertices) / 3), 3), dtype=np.float32)
+        for i1, v1 in enumerate(self.vertices):
+            triangleNum = int(np.floor(i1 / 3))
+            for i2, v2 in enumerate(uniques):
+                if np.array_equal(v1, v2):
+                    a[triangleNum][i1 % 3] = i2 
+
+        return a
+
 
 class Triangle:
     vertices = []
