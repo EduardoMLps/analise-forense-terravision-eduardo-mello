@@ -43,10 +43,11 @@ def init():
     #colocar atributos no VBO
     glBufferData(
         GL_ARRAY_BUFFER,
-        m1.getVerticesSize(),
-        m1.getVertices(),
+        m1.getUniquesVertices().nbytes,
+        m1.getUniquesVertices(),
         GL_STATIC_DRAW
     )
+    glEnableVertexAttribArray(0)
     #descrever atributos
     glVertexAttribPointer(
         0, #Código do atributo (posição)
@@ -56,6 +57,7 @@ def init():
         5*4, #qnt de bytes entre um atributo e o próximo
         ctypes.c_void_p(0) #ponteiro para onde começa os parâmetros
     )
+    glEnableVertexAttribArray(1)
     glVertexAttribPointer(
         1, #Código do atributo (cor)
         3, #Quantos valores por atributo
@@ -65,12 +67,22 @@ def init():
         ctypes.c_void_p(2*4) #ponteiro para onde começa os parâmetros
     )
     #Ativar atributos
-    glEnableVertexAttribArray(0)
-    glEnableVertexAttribArray(1)
+
+    
+
+    # criar EBO:
+    EBOid = glGenBuffers(1)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOid)
+
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        m1.getFacesIndex().nbytes,
+        m1.getFacesIndex(),
+        GL_STATIC_DRAW
+    )
 
     glBindBuffer(GL_ARRAY_BUFFER, 0)
     glBindVertexArray(0)
-
     #Criar shaders
 
     #Código fonte do shader:
@@ -95,7 +107,9 @@ def render():
     glUseProgram(shaderId)
 
     glBindVertexArray(VAOId)
-    glDrawArrays(GL_TRIANGLES, 0, len(m1.getVertices()))
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, None)
+    glBindVertexArray(0)
+    glUseProgram(0)
     
 
 def main():

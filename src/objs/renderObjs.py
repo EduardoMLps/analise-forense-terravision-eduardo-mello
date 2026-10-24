@@ -36,7 +36,7 @@ class VertexMatrix:
                 if np.array_equal(v1, v2):
                     a[triangleNum][i1 % 3] = i2 
 
-        return a
+        return np.array(a, dtype=np.uint32)
 
 
 class Triangle:
