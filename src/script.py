@@ -8,21 +8,23 @@ m1 = objs.VertexMatrix()
 
 t1 = objs.Triangle()
 t1.setVertices(
-    [-0.5, 0.5, 1, 0, 0],
-    [0.5, 0.5, 0, 1, 0],
-    [0.5, -0.5, 0, 0, 1]
+    [-0.5, 0.5, 1, 0, 0, -1.0, 1.0],
+    [0.5, 0.5, 0, 1, 0, 1.0, 1.0],
+    [0.5, -0.5, 0, 0, 1, 1.0, -1.0]
 )
 
 t2 = objs.Triangle()
 t2.setVertices(
-    [-0.5, 0.5, 1, 0, 0],
-    [0.5, -0.5, 0, 0, 1],
-    [-0.5, -0.5, 1, 0, 1]
+    [-0.5, 0.5, 1, 0, 0, -1.0, 1.0],
+    [0.5, -0.5, 0, 0, 1, 1.0, -1.0],
+    [-0.5, -0.5, 1, 0, 1, -1.0, -1.0]
 )
 
 #Eu não sei o porque, mas adicionar o primeiro triângulo à matriz adiciona todos os triângulos...
 m1.addElement(t1)
 m1.addElement(t2)
+
+tex1 = objs.Material()
 
 VAOId = 0
 shaderId = 0
@@ -31,12 +33,15 @@ def init():
     global VAOId, shaderId
 
     glClearColor(0,0,0,1)
+
+    #Texturas:
+
+
     #iniciar VBO - obter id
     VBOId = glGenBuffers(1)
 
     VAOId = glGenVertexArrays(1)
     glBindVertexArray(VAOId)
-
 
     #Ativar VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBOId)
@@ -54,7 +59,7 @@ def init():
         2, #Quantos valores por atributo
         GL_FLOAT, #Tipo de dado
         GL_FALSE, #Deve ser normalizado
-        5*4, #qnt de bytes entre um atributo e o próximo
+        7*4, #qnt de bytes entre um atributo e o próximo
         ctypes.c_void_p(0) #ponteiro para onde começa os parâmetros
     )
     glEnableVertexAttribArray(1)
@@ -63,8 +68,18 @@ def init():
         3, #Quantos valores por atributo
         GL_FLOAT, #Tipo de dado
         GL_FALSE, #Deve ser normalizado
-        5*4, #qnt de bytes entre um atributo e o próximo
+        7*4, #qnt de bytes entre um atributo e o próximo
         ctypes.c_void_p(2*4) #ponteiro para onde começa os parâmetros
+    )
+    #Atributo de coordenadas UV
+    glEnableVertexAttribArray(2)
+    glVertexAttribPointer(
+        2,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        7*4,
+        ctypes.c_void_p(5*4)
     )
     #Ativar atributos
 
@@ -106,6 +121,7 @@ def render():
 
     glUseProgram(shaderId)
 
+    tex1.use()
     glBindVertexArray(VAOId)
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, None)
     glBindVertexArray(0)

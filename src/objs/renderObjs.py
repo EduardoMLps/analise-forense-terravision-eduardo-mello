@@ -1,4 +1,33 @@
 import numpy as np
+from OpenGL.GL import *
+import pygame as pg
+class Material:
+    def __init__(self):
+        self.texture = glGenTextures(1)
+
+    def load_from_file(self, path):
+        image = pg.image.load(path).convert_alpha()
+        width, height = image.get_rect().size
+        data = pg.image.tobytes(image, "RGBA", False)
+
+        glBindImageTexture(GL_TEXTURE_2D, self.texture)
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RGBA,
+            width, height,
+            0,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            data
+        )
+        return self
+
+    def use(self):
+        glBindTexture(GL_TEXTURE_2D, self.texture)
+
+    def destroy(self):
+        glDeleteTextures(1, (self.texture,))
 
 class VertexMatrix:
     vertices = None
