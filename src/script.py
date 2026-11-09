@@ -8,16 +8,16 @@ m1 = objs.VertexMatrix()
 
 t1 = objs.Triangle()
 t1.setVertices(
-    [-0.5, 0.5, 1, 0, 0, -1.0, 1.0],
+    [-0.5, 0.5, 1, 0, 0, 0, 1.0],
     [0.5, 0.5, 0, 1, 0, 1.0, 1.0],
-    [0.5, -0.5, 0, 0, 1, 1.0, -1.0]
+    [0.5, -0.5, 0, 0, 1, 1.0, 0]
 )
 
 t2 = objs.Triangle()
 t2.setVertices(
-    [-0.5, 0.5, 1, 0, 0, -1.0, 1.0],
-    [0.5, -0.5, 0, 0, 1, 1.0, -1.0],
-    [-0.5, -0.5, 1, 0, 1, -1.0, -1.0]
+    [-0.5, 0.5, 1, 0, 0, 0, 1.0],
+    [0.5, -0.5, 0, 0, 1, 1.0, 0],
+    [-0.5, -0.5, 1, 0, 1, 0, 0]
 )
 
 #Eu não sei o porque, mas adicionar o primeiro triângulo à matriz adiciona todos os triângulos...
@@ -114,6 +114,8 @@ def init():
 
     #criar shader program:
     shaderId = gls.compileProgram(vsId, fsId)
+
+    tex1.load_from_file("src/websearch/tiles/1_0_0.png")
      
 
 def render():
@@ -121,7 +123,7 @@ def render():
 
     glUseProgram(shaderId)
 
-    tex1.use()
+    tex1.use(shaderId)
     glBindVertexArray(VAOId)
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, None)
     glBindVertexArray(0)
@@ -135,9 +137,9 @@ def main():
     
     init()
     while not glfw.window_should_close(window):
-        glfw.poll_events()
         render()
         glfw.swap_buffers(window)
+        glfw.poll_events()
     glfw.terminate()
 
 main()

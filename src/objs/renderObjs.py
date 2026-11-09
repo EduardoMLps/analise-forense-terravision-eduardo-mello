@@ -1,30 +1,56 @@
 import numpy as np
 from OpenGL.GL import *
-import pygame as pg
+from PIL import Image
 class Material:
-    def __init__(self):
+    texture = None
+    def load_from_file(self, path):
+        image = Image.open(path).convert("RGB")
+        image = image.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+
+        width, height = image.size
+
+        data = np.array(image, dtype=np.uint8)
+
         self.texture = glGenTextures(1)
 
-    def load_from_file(self, path):
-        image = pg.image.load(path).convert_alpha()
-        width, height = image.get_rect().size
-        data = pg.image.tobytes(image, "RGBA", False)
+        glBindTexture(GL_TEXTURE_2D, self.texture)
 
-        glBindImageTexture(GL_TEXTURE_2D, self.texture)
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
-            GL_RGBA,
-            width, height,
+            GL_RGB,
+            width,
+            height,
             0,
-            GL_RGBA,
+            GL_RGB,
             GL_UNSIGNED_BYTE,
             data
         )
-        return self
 
-    def use(self):
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+
+    def use(self, program):
+        if self.texture is None:
+            raise RuntimeError("A textura não foi carregada!")
+
+        glUseProgram(program)
+
+        glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, self.texture)
+
+        location = glGetUniformLocation(program, "uTexture")
+
+        if location == -1 or location is None:
+            raise RuntimeError(
+                "Uniform 'uTexture' não encontrado no shader!"
+            )
+
+        glUniform1i(location, 0)
+        
 
     def destroy(self):
         glDeleteTextures(1, (self.texture,))
