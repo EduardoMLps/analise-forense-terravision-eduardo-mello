@@ -6,31 +6,37 @@ import ctypes
 
 m1 = objs.VertexMatrix()
 
-t1 = objs.Triangle()
-t1.setVertices(
-    [-0.5, 0.5, 1, 0, 0, 0, 1.0],
-    [0.5, 0.5, 0, 1, 0, 1.0, 1.0],
-    [0.5, -0.5, 0, 0, 1, 1.0, 0]
-)
+#t1 = objs.Triangle()
+#t1.setVertices( # x, y, z, u, v
+#    [-0.5, 0.5, 1, 0, 1.0],
+#    [0.5, 0.5, 0, 1.0, 1.0],
+#    [0.5, -0.5, 0, 1.0, 0]
+#)
 
-t2 = objs.Triangle()
-t2.setVertices(
-    [-0.5, 0.5, 1, 0, 0, 0, 1.0],
-    [0.5, -0.5, 0, 0, 1, 1.0, 0],
-    [-0.5, -0.5, 1, 0, 1, 0, 0]
-)
+#t2 = objs.Triangle()
+#t2.setVertices(
+#    [-0.5, 0.5, 1, 0, 1.0],
+#    [0.5, -0.5, 0, 1.0, 0],
+#    [-0.5, -0.5, 1, 0, 0]
+#)
 
 #Eu não sei o porque, mas adicionar o primeiro triângulo à matriz adiciona todos os triângulos...
-m1.addElement(t1)
-m1.addElement(t2)
+#m1.addElement(t1)
+#m1.addElement(t2)
 
-tex1 = objs.Material()
+m1.addSphere(radius=0.5)
+
+tex1 = objs.Material() 
 
 VAOId = 0
 shaderId = 0
 
 def init():
     global VAOId, shaderId
+
+    glEnable(GL_DEPTH_TEST)
+    glDepthFunc(GL_LESS)
+    glClearDepth(1.0)
 
     glClearColor(0,0,0,1)
 
@@ -56,21 +62,21 @@ def init():
     #descrever atributos
     glVertexAttribPointer(
         0, #Código do atributo (posição)
-        2, #Quantos valores por atributo
-        GL_FLOAT, #Tipo de dado
-        GL_FALSE, #Deve ser normalizado
-        7*4, #qnt de bytes entre um atributo e o próximo
-        ctypes.c_void_p(0) #ponteiro para onde começa os parâmetros
-    )
-    glEnableVertexAttribArray(1)
-    glVertexAttribPointer(
-        1, #Código do atributo (cor)
         3, #Quantos valores por atributo
         GL_FLOAT, #Tipo de dado
         GL_FALSE, #Deve ser normalizado
-        7*4, #qnt de bytes entre um atributo e o próximo
-        ctypes.c_void_p(2*4) #ponteiro para onde começa os parâmetros
+        5*4, #qnt de bytes entre um atributo e o próximo
+        ctypes.c_void_p(0) #ponteiro para onde começa os parâmetros
     )
+    #glEnableVertexAttribArray(1)
+    #glVertexAttribPointer(
+    #    1, #Código do atributo (cor)
+    #    3, #Quantos valores por atributo
+    #    GL_FLOAT, #Tipo de dado
+    #    GL_FALSE, #Deve ser normalizado
+    #    7*4, #qnt de bytes entre um atributo e o próximo
+    #    ctypes.c_void_p(2*4) #ponteiro para onde começa os parâmetros
+    #)
     #Atributo de coordenadas UV
     glEnableVertexAttribArray(2)
     glVertexAttribPointer(
@@ -78,8 +84,8 @@ def init():
         2,
         GL_FLOAT,
         GL_FALSE,
-        7*4,
-        ctypes.c_void_p(5*4)
+        5*4,
+        ctypes.c_void_p(3*4)
     )
     #Ativar atributos
 
@@ -119,13 +125,13 @@ def init():
      
 
 def render():
-    glClear(GL_COLOR_BUFFER_BIT)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glUseProgram(shaderId)
 
     tex1.use(shaderId)
     glBindVertexArray(VAOId)
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, None)
+    glDrawElements(GL_TRIANGLES, len(m1.getFacesIndex().flatten()), GL_UNSIGNED_INT, None)
     glBindVertexArray(0)
     glUseProgram(0)
     

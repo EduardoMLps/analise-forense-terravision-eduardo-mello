@@ -62,7 +62,58 @@ class VertexMatrix:
         if self.vertices is None:
             self.vertices = element.getVertices()
         else:
-            np.concatenate((self.vertices, element.getVertices()), axis=0)
+            self.vertices = np.concatenate((self.vertices, element.getVertices()), axis=0)
+    
+    def addSphere(self, radius=1.0, sectors=32, stacks=16, center=(0.0, 0.0, 0.0)):
+
+        vertices = []
+
+        cx, cy, cz = center
+
+        for i in range(stacks):
+            phi1 = np.pi * i / stacks
+            phi2 = np.pi * (i + 1) / stacks
+
+            for j in range(sectors):
+                theta1 = 2.0 * np.pi * j / sectors
+                theta2 = 2.0 * np.pi * (j + 1) / sectors
+
+                def vertex(phi, theta):
+                    x = radius * np.sin(phi) * np.cos(theta)
+                    y = radius * np.cos(phi)
+                    z = radius * np.sin(phi) * np.sin(theta)
+
+                    u = theta / (2.0 * np.pi)
+                    v = 1.0 - phi / np.pi
+
+                    return [
+                        cx + x,
+                        cy + y,
+                        cz + z,
+                        u,
+                        v
+                    ]
+
+                v1 = vertex(phi1, theta1)
+                v2 = vertex(phi2, theta1)
+                v3 = vertex(phi2, theta2)
+                v4 = vertex(phi1, theta2)
+
+                # Primeiro triângulo
+                vertices.extend([v1, v2, v3])
+
+                # Segundo triângulo
+                vertices.extend([v1, v3, v4])
+
+        vertices = np.array(vertices, dtype=np.float32)
+
+        if self.vertices is None:
+            self.vertices = vertices
+        else:
+            self.vertices = np.concatenate(
+                (self.vertices, vertices),
+                axis=0
+            )
 
     def getVertices(self):
         return np.array(self.vertices, np.dtype(np.float32))
