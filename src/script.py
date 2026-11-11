@@ -30,9 +30,10 @@ tex1 = objs.Material()
 
 VAOId = 0
 shaderId = 0
+amountOfFaces = None
 
 def init():
-    global VAOId, shaderId
+    global VAOId, shaderId, amountOfFaces
 
     glEnable(GL_DEPTH_TEST)
     glDepthFunc(GL_LESS)
@@ -122,6 +123,9 @@ def init():
     shaderId = gls.compileProgram(vsId, fsId)
 
     tex1.load_from_file("src/websearch/tiles/0_0_0.png")
+    tex1.use(shaderId)
+
+    amountOfFaces = len(m1.getFacesIndex().flatten())
      
 
 def render():
@@ -129,9 +133,9 @@ def render():
 
     glUseProgram(shaderId)
 
-    tex1.use(shaderId)
+    
     glBindVertexArray(VAOId)
-    glDrawElements(GL_TRIANGLES, len(m1.getFacesIndex().flatten()), GL_UNSIGNED_INT, None)
+    glDrawElements(GL_TRIANGLES, amountOfFaces, GL_UNSIGNED_INT, None)
     glBindVertexArray(0)
     glUseProgram(0)
     
