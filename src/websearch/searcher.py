@@ -3,7 +3,7 @@ from pathlib import Path
 
 import requests
 
-urlBase = "https://earthengine.googleapis.com/v1/projects/earthengine-legacy/maps/ade39642daac89ccf4ccc0086ea23f5b-0c19e1f3d8e60874abd07bdc389c4938/tiles/{z}/{x}/{y}"
+urlBase = "https://earthengine.googleapis.com/v1/projects/earthengine-legacy/maps/ade39642daac89ccf4ccc0086ea23f5b-a07c03accd592960ecd9bb69b8734aa1/tiles/{z}/{x}/{y}"
 
 PASTA = Path("src/websearch/tiles")
 PASTA.mkdir(exist_ok=True)
@@ -11,7 +11,7 @@ PASTA.mkdir(exist_ok=True)
 sessao = requests.Session()
 sessao.headers["User-Agent"] = "CroplandsResearch/1.0"
 
-zoom = 1
+zoom = 0
 n = 2 ** zoom
 
 for y in range(n):

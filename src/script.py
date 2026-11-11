@@ -121,7 +121,7 @@ def init():
     #criar shader program:
     shaderId = gls.compileProgram(vsId, fsId)
 
-    tex1.load_from_file("src/websearch/tiles/1_0_0.png")
+    tex1.load_from_file("src/websearch/tiles/0_0_0.png")
      
 
 def render():
@@ -136,11 +136,17 @@ def render():
     glUseProgram(0)
     
 
+def key_callback(window, key, scancode, action, mods):
+    if key == glfw.KEY_ESCAPE and action == glfw.PRESS:
+        glfw.set_window_should_close(window, 1)
+
 def main():
     glfw.init()
     window = glfw.create_window(500, 500, "G.R.E.E.N", None, None)
     glfw.make_context_current(window)
     
+    glfw.set_key_callback(window, key_callback)
+
     init()
     while not glfw.window_should_close(window):
         render()
