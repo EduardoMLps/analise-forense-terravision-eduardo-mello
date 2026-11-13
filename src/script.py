@@ -24,6 +24,9 @@ m1 = objs.VertexMatrix()
 #m1.addElement(t1)
 #m1.addElement(t2)
 
+rotationY = 0.0
+rotationX = 0.0
+
 m1.addSphere(radius=0.5)
 
 tex1 = objs.Material() 
@@ -57,7 +60,7 @@ def init():
         GL_ARRAY_BUFFER,
         m1.getUniquesVertices().nbytes,
         m1.getUniquesVertices(),
-        GL_STATIC_DRAW
+        GL_DYNAMIC_DRAW
     )
     glEnableVertexAttribArray(0)
     #descrever atributos
@@ -100,7 +103,7 @@ def init():
         GL_ELEMENT_ARRAY_BUFFER,
         m1.getFacesIndex().nbytes,
         m1.getFacesIndex(),
-        GL_STATIC_DRAW
+        GL_DYNAMIC_DRAW
     )
 
     glBindBuffer(GL_ARRAY_BUFFER, 0)
@@ -109,10 +112,10 @@ def init():
 
     #Código fonte do shader:
     #ler vertex shader:
-    with open("src/shaders/vertexShader.glsl", "r") as file:
+    with open("shaders/vertexShader.glsl", "r") as file:
         vsSource = file.read()
     #ler fragment shader:
-    with open("src/shaders/fragmentShader.glsl", "r") as file:
+    with open("shaders/fragmentShader.glsl", "r") as file:
         fsSource = file.read()
 
     #Compilar shaders
@@ -122,7 +125,7 @@ def init():
     #criar shader program:
     shaderId = gls.compileProgram(vsId, fsId)
 
-    tex1.load_from_file("src/websearch/tiles/0_0_0.png")
+    tex1.load_from_file("websearch/tiles/0_0_0.png")
     tex1.use(shaderId)
 
     amountOfFaces = len(m1.getFacesIndex().flatten())
@@ -132,7 +135,10 @@ def render():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glUseProgram(shaderId)
-
+    rotationYLocation = glGetUniformLocation(shaderId, "rotationY")
+    rotationXLocation = glGetUniformLocation(shaderId, "rotationX")
+    glUniform1f(rotationYLocation, rotationY)
+    glUniform1f(rotationXLocation, rotationX)
     
     glBindVertexArray(VAOId)
     glDrawElements(GL_TRIANGLES, amountOfFaces, GL_UNSIGNED_INT, None)
@@ -141,8 +147,18 @@ def render():
     
 
 def key_callback(window, key, scancode, action, mods):
+    global rotationY, rotationX
     if key == glfw.KEY_ESCAPE and action == glfw.PRESS:
         glfw.set_window_should_close(window, 1)
+    if action == glfw.PRESS or action == glfw.REPEAT:
+        if key == glfw.KEY_RIGHT:
+            rotationY -= 0.05
+        if key == glfw.KEY_LEFT:
+            rotationY += 0.05
+        if key == glfw.KEY_UP:
+            rotationX += 0.05
+        if key == glfw.KEY_DOWN:
+            rotationX -= 0.05
 
 def main():
     glfw.init()
