@@ -3,6 +3,8 @@ from OpenGL.GL import *
 import OpenGL.GL.shaders as gls
 from objs import renderObjs as objs
 import ctypes
+import numpy as np
+import math
 
 m1 = objs.VertexMatrix()
 
@@ -26,6 +28,9 @@ m1 = objs.VertexMatrix()
 
 rotationY = 0.0
 rotationX = 0.0
+cameraDistance = 2.0
+cameraPosition = [0.0, 0.0, 2.0]
+
 
 m1.addSphere(radius=0.5)
 
@@ -34,6 +39,44 @@ tex1 = objs.Material()
 VAOId = 0
 shaderId = 0
 amountOfFaces = None
+
+def lookAt(eye, target, up):
+
+    forward = np.array(target) - np.array(eye)
+    forward = forward / np.linalg.norm(forward)
+
+    right = np.cross(forward, up)
+    right = right / np.linalg.norm(right)
+
+    up = np.cross(right, forward)
+
+    view = np.identity(4, dtype=np.float32)
+
+    view[0, :3] = right
+    view[1, :3] = up
+    view[2, :3] = -forward
+
+    view[0, 3] = -np.dot(right, eye)
+    view[1, 3] = -np.dot(up, eye)
+    view[2, 3] = np.dot(forward, eye)
+
+    return view
+
+def perspective(fov, aspect, near, far):
+
+    f = 1.0 / math.tan(math.radians(fov) / 2.0)
+
+    projection = np.zeros((4, 4), dtype=np.float32)
+
+    projection[0, 0] = f / aspect
+    projection[1, 1] = f
+
+    projection[2, 2] = (far + near) / (near - far)
+    projection[2, 3] = (2.0 * far * near) / (near - far)
+
+    projection[3, 2] = -1.0
+
+    return projection
 
 def init():
     global VAOId, shaderId, amountOfFaces
@@ -112,10 +155,10 @@ def init():
 
     #Código fonte do shader:
     #ler vertex shader:
-    with open("shaders/vertexShader.glsl", "r") as file:
+    with open("src/shaders/vertexShader.glsl", "r") as file:
         vsSource = file.read()
     #ler fragment shader:
-    with open("shaders/fragmentShader.glsl", "r") as file:
+    with open("src/shaders/fragmentShader.glsl", "r") as file:
         fsSource = file.read()
 
     #Compilar shaders
@@ -125,7 +168,7 @@ def init():
     #criar shader program:
     shaderId = gls.compileProgram(vsId, fsId)
 
-    tex1.load_from_file("websearch/tiles/0_0_0.png")
+    tex1.load_from_file("src/websearch/tiles/0_0_0.png")
     tex1.use(shaderId)
 
     amountOfFaces = len(m1.getFacesIndex().flatten())
@@ -140,6 +183,32 @@ def render():
     glUniform1f(rotationYLocation, rotationY)
     glUniform1f(rotationXLocation, rotationX)
     
+    eye = np.array(
+        [0.0, 0.0, cameraDistance],
+        dtype=np.float32
+    )
+
+    target = np.array([0.0, 0.0, 0.0], dtype=np.float32)
+
+    up = np.array([0.0, 1.0, 0.0], dtype=np.float32)
+
+    view = lookAt(eye, target, up)
+
+    projection = perspective(
+        45.0,
+        500 / 500,
+        0.1,
+        100.0
+    )
+
+    viewLocation = glGetUniformLocation(shaderId, "view")
+    projectionLocation = glGetUniformLocation(shaderId, "projection")
+
+    glUniformMatrix4fv(viewLocation, 1, GL_TRUE, view)
+    glUniformMatrix4fv(projectionLocation, 1, GL_TRUE, projection)
+
+
+    
     glBindVertexArray(VAOId)
     glDrawElements(GL_TRIANGLES, amountOfFaces, GL_UNSIGNED_INT, None)
     glBindVertexArray(0)
@@ -147,18 +216,22 @@ def render():
     
 
 def key_callback(window, key, scancode, action, mods):
-    global rotationY, rotationX
+    global rotationY, rotationX, cameraDistance
     if key == glfw.KEY_ESCAPE and action == glfw.PRESS:
         glfw.set_window_should_close(window, 1)
     if action == glfw.PRESS or action == glfw.REPEAT:
         if key == glfw.KEY_RIGHT:
-            rotationY -= 0.05
-        if key == glfw.KEY_LEFT:
             rotationY += 0.05
+        if key == glfw.KEY_LEFT:
+            rotationY -= 0.05
         if key == glfw.KEY_UP:
-            rotationX += 0.05
-        if key == glfw.KEY_DOWN:
             rotationX -= 0.05
+        if key == glfw.KEY_DOWN:
+            rotationX += 0.05
+        if key == glfw.KEY_KP_ADD:
+            cameraDistance = max(0.6, cameraDistance - 0.03)
+        if key == glfw.KEY_KP_SUBTRACT:
+            cameraDistance += 0.03
 
 def main():
     glfw.init()

@@ -9,6 +9,8 @@ out vec2 f_uvcoord;
 
 uniform float rotationY;
 uniform float rotationX;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main() {
     mat4 rotY = mat4(
@@ -25,8 +27,9 @@ void main() {
         0.0, 0.0,             0.0,            1.0
     );
 
+    mat4 model = rotX * rotY;
 
     f_color = a_col;
-    f_uvcoord = a_uvcoord;
-    gl_Position = rotX * rotY * vec4(a_pos, 1.0);
+    f_uvcoord = vec2(1.0 - a_uvcoord.x, a_uvcoord.y);
+    gl_Position = projection * view * model * vec4(a_pos, 1.0);
 }
