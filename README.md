@@ -25,3 +25,5 @@ Para movimentar o globo basta usar:
 - \+ para ampliar o globo
 - \- para diminuir o globo
 
+## Como executar:
+Basta abrir o vscode e clicar em executar ou usar o terminal do python
