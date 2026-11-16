@@ -5,6 +5,9 @@ from objs import renderObjs as objs
 import ctypes
 import numpy as np
 import math
+from objs.TileManager import TileManager
+
+tileManager = None
 
 m1 = objs.VertexMatrix()
 
@@ -79,7 +82,13 @@ def perspective(fov, aspect, near, far):
     return projection
 
 def init():
-    global VAOId, shaderId, amountOfFaces
+    global VAOId, shaderId, amountOfFaces, tileManager
+
+    tileManager = TileManager(
+        directory="src/websearch/tiles",
+        radius=0.5,
+        max_zoom=8
+    )
 
     glEnable(GL_DEPTH_TEST)
     glDepthFunc(GL_LESS)
@@ -168,8 +177,7 @@ def init():
     #criar shader program:
     shaderId = gls.compileProgram(vsId, fsId)
 
-    tex1.load_from_file("src/websearch/tiles/0_0_0.png")
-    tex1.use(shaderId)
+    
 
     amountOfFaces = len(m1.getFacesIndex().flatten())
      
@@ -209,9 +217,13 @@ def render():
 
 
     
-    glBindVertexArray(VAOId)
-    glDrawElements(GL_TRIANGLES, amountOfFaces, GL_UNSIGNED_INT, None)
-    glBindVertexArray(0)
+    tileManager.update(
+        cameraDistance,
+        rotationX,
+        rotationY
+    )
+
+    tileManager.draw(shaderId)
     glUseProgram(0)
     
 
@@ -246,5 +258,6 @@ def main():
         glfw.swap_buffers(window)
         glfw.poll_events()
     glfw.terminate()
+    tileManager.destroy()
 
 main()

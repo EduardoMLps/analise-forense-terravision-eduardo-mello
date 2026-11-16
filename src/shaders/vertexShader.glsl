@@ -30,6 +30,6 @@ void main() {
     mat4 model = rotX * rotY;
 
     f_color = a_col;
-    f_uvcoord = vec2(1.0 - a_uvcoord.x, a_uvcoord.y);
+    f_uvcoord = a_uvcoord;
     gl_Position = projection * view * model * vec4(a_pos, 1.0);
 }

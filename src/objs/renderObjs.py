@@ -1,6 +1,8 @@
 import numpy as np
 from OpenGL.GL import *
 from PIL import Image
+
+
 class Material:
     texture = None
     def load_from_file(self, path):
@@ -32,6 +34,10 @@ class Material:
 
         glBindTexture(GL_TEXTURE_2D, 0)
 
+    def destroy(self):
+        if self.texture is not None:
+            glDeleteTextures(1, [self.texture])
+            self.texture = None
 
     def use(self, program):
         if self.texture is None:
